@@ -74,6 +74,7 @@ pub trait Action: Component {
     fn undo(&mut self, world: &mut World);
 }
 
+// TODO: use single `VecDeque` instead
 #[derive(Resource, Reflect, Default, Debug, Clone)]
 #[reflect(Resource, MapEntitiesResource, Default)]
 pub struct History {
