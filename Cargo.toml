@@ -1,0 +1,9 @@
+[package]
+name = "bevy_playground"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+bevy = { git = "https://github.com/bevyengine/bevy.git", version = "0.15.0-dev" }
+serde = "1.0.210"
+thiserror = "1.0.63"
