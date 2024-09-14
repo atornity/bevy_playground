@@ -11,7 +11,7 @@ pub struct PerformAction<T: Action> {
 
 impl<T: Action + Clone> Command for PerformAction<T> {
     fn apply(mut self, world: &mut World) {
-        // since HistoryItem is not Reflect it must be added as a required components to be deserializable
+        // since HistoryItem is not Reflect it must be added as a required components to be serializable
         #[cfg(debug_assertions)]
         {
             let action_id = world.init_component::<T>();
@@ -23,7 +23,7 @@ impl<T: Action + Clone> Command for PerformAction<T> {
                 .any(|id| id == history_item_id)
             {
                 warn!(
-                    "Deserialization won't work unless `{0}` requires `{1}`, try annotating `{0}` with `#[require({1}::new::<Self>)]`",
+                    "Serialization won't work unless `{0}` requires `{1}`, try annotating `{0}` with `#[require({1}::new::<Self>)]`",
                     std::any::type_name::<T>(),
                     std::any::type_name::<HistoryItem>()
                 );
