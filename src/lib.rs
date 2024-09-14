@@ -1,4 +1,4 @@
-use std::collections::VecDeque;
+use std::collections::{vec_deque::Drain, VecDeque};
 
 use bevy::{
     ecs::{entity::MapEntities, reflect::ReflectMapEntitiesResource},
@@ -34,7 +34,7 @@ impl<T: Action + Clone> Command for PerformAction<T> {
 
         self.action.apply(world);
         let entity = world.spawn((self.action, HistoryItem::new::<T>())).id();
-        let future = world.resource_mut::<History>().push(entity);
+        let future: Vec<Entity> = world.resource_mut::<History>().push(entity).collect();
         for entity in future {
             world.despawn(entity);
         }
@@ -122,18 +122,11 @@ impl History {
     /// Push an item to the past, clearing the future history.
     ///
     /// Note: the returned entities should be despawned.
-    pub fn push(&mut self, entity: Entity) -> Vec<Entity> {
-        let mut removed = Vec::with_capacity(self.items.len() - self.index);
-        while self.items.len() > self.index {
-            if let Some(e) = self.items.pop_back() {
-                removed.push(e);
-            }
-        }
-
+    pub fn push(&mut self, entity: Entity) -> Drain<Entity> {
+        let range = self.index..self.items.len();
         self.items.push_back(entity);
         self.index += 1;
-
-        removed
+        self.items.drain(range)
     }
 }
 
