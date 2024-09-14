@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use bevy::{
     ecs::{entity::MapEntities, reflect::ReflectMapEntitiesResource},
     prelude::*,
@@ -32,7 +34,7 @@ impl<T: Action + Clone> Command for PerformAction<T> {
 
         self.action.apply(world);
         let entity = world.spawn((self.action, HistoryItem::new::<T>())).id();
-        let future: Vec<Entity> = world.resource_mut::<History>().push(entity).collect();
+        let future = world.resource_mut::<History>().push(entity);
         for entity in future {
             world.despawn(entity);
         }
@@ -75,49 +77,63 @@ pub trait Action: Component {
 #[derive(Resource, Reflect, Default, Debug, Clone)]
 #[reflect(Resource, MapEntitiesResource, Default)]
 pub struct History {
-    pub past: Vec<Entity>,
-    pub future: Vec<Entity>,
+    pub items: VecDeque<Entity>,
+    pub index: usize,
 }
 
 impl MapEntities for History {
     fn map_entities<M: EntityMapper>(&mut self, mapper: &mut M) {
-        for e in self.past.iter_mut().chain(self.future.iter_mut()) {
+        for e in self.items.iter_mut() {
             *e = mapper.map_entity(*e);
         }
     }
 }
 
 impl History {
-    pub fn new(
-        past: impl IntoIterator<Item = Entity>,
-        future: impl IntoIterator<Item = Entity>,
-    ) -> Self {
+    pub fn new(past: impl IntoIterator<Item = Entity>) -> Self {
+        let actions = VecDeque::from_iter(past);
         Self {
-            past: Vec::from_iter(past),
-            future: Vec::from_iter(future),
+            index: actions.len(),
+            items: actions,
         }
     }
 
     /// Go back one step in the history, returning the [`Entity`] of the [`HistoryItem`].
     pub fn back(&mut self) -> Option<Entity> {
-        let value = self.past.pop()?;
-        self.future.push(value);
-        Some(value)
+        if self.index > 0 {
+            self.index -= 1;
+            Some(self.items[self.index])
+        } else {
+            None
+        }
     }
 
     /// Go forward one step in the history, returning the [`Entity`] of the [`HistoryItem`].
     pub fn forward(&mut self) -> Option<Entity> {
-        let value = self.future.pop()?;
-        self.past.push(value);
-        Some(value)
+        if self.index < self.items.len() {
+            let entity = self.items[self.index];
+            self.index += 1;
+            Some(entity)
+        } else {
+            None
+        }
     }
 
     /// Push an item to the past, clearing the future history.
     ///
     /// Note: the returned entities should be despawned.
-    pub fn push(&mut self, entity: Entity) -> std::vec::Drain<Entity> {
-        self.past.push(entity);
-        self.future.drain(..)
+    pub fn push(&mut self, entity: Entity) -> Vec<Entity> {
+        let mut removed = Vec::with_capacity(self.items.len() - self.index);
+        while self.items.len() > self.index {
+            if let Some(e) = self.items.pop_back() {
+                removed.push(e);
+            }
+        }
+
+        self.items.push_back(entity);
+        self.index += 1;
+
+        removed
     }
 }
 

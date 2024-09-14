@@ -206,7 +206,7 @@ fn save_load_input(
 }
 
 fn debug_history(world: &mut World) {
-    let Some((history, level)) = world
+    let Some((history, _level)) = world
         .get_resource::<History>()
         .zip(world.get_resource::<Level>())
     else {
@@ -214,24 +214,12 @@ fn debug_history(world: &mut World) {
     };
 
     print!("[ ");
-    for e in history.past.iter() {
-        match world.get::<SetLevel>(*e) {
-            Some(level) => print!("{} ", level.0),
-            None => print!("* "),
-        }
+    for _ in 0..history.index {
+        print!("* ")
     }
-    print!("[{}]", level.0);
-    if !history.future.is_empty() {
-        print!(" ");
-    }
-    for (i, e) in history.future.iter().rev().enumerate() {
-        match world.get::<SetLevel>(*e) {
-            Some(level) => print!("{}", level.0),
-            None => print!("*"),
-        }
-        if i != history.future.len() - 1 {
-            print!(" ");
-        }
+    print!("[*]");
+    for _ in history.index..history.items.len() {
+        print!("* ")
     }
     println!(" ]");
 }
