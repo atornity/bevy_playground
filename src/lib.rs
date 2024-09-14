@@ -39,6 +39,7 @@ impl<T: Action + Clone> Command for PerformAction<T> {
     }
 }
 
+/// Undo the last action
 pub struct Undo;
 
 impl Command for Undo {
@@ -52,6 +53,7 @@ impl Command for Undo {
     }
 }
 
+/// Redo the last action
 pub struct Redo;
 
 impl Command for Redo {
