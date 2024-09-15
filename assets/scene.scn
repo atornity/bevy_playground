@@ -2,25 +2,78 @@
   resources: {
     "bevy_playground::History": (
       items: [
-        12884901900,
-        12884901891,
-        12884901890,
-        12884901889,
-        8589934599,
-        8589934600,
-        8589934601,
         8589934602,
-        8589934603,
-        4294967309,
+        8589934601,
+        12884901890,
+        12884901891,
+        12884901893,
+        12884901895,
+        12884901896,
+        8589934593,
         4294967310,
         4294967311,
+        4294967312,
+        4294967313,
+        4294967314,
+        4294967315,
+        4294967316,
       ],
-      index: 12,
+      index: 9,
     ),
-    "bevy_playground::Level": (0),
+    "bevy_playground::Level": (4),
   },
   entities: {
     4294967302: (
+      components: {
+        "bevy_playground::LevelText": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (true),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((
+          matrix3: (
+            x_axis: (
+              x: 1.0,
+              y: 0.0,
+              z: 0.0,
+            ),
+            y_axis: (
+              x: 0.0,
+              y: 1.0,
+              z: 0.0,
+            ),
+            z_axis: (
+              x: 0.0,
+              y: 0.0,
+              z: 1.0,
+            ),
+          ),
+          translation: (
+            x: 48.0,
+            y: 12.0,
+            z: 0.0,
+          ),
+        )),
+        "bevy_transform::components::transform::Transform": (
+          translation: (
+            x: 48.0,
+            y: 12.0,
+            z: 0.0,
+          ),
+          rotation: (
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+            w: 1.0,
+          ),
+          scale: (
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+          ),
+        ),
+      },
+    ),
+    4294967309: (
       components: {
         "bevy_render::view::visibility::InheritedVisibility": (true),
         "bevy_render::view::visibility::ViewVisibility": (false),
@@ -69,25 +122,13 @@
         ),
       },
     ),
-    4294967309: (
-      components: {
-        "bevy_playground::MoveEntity": (
-          entity: 8589934597,
-          delta: (
-            x: 0.0,
-            y: -100.0,
-            z: 0.0,
-          ),
-        ),
-      },
-    ),
     4294967310: (
       components: {
         "bevy_playground::MoveEntity": (
-          entity: 8589934597,
+          entity: 8589934604,
           delta: (
-            x: -100.0,
-            y: 0.0,
+            x: 0.0,
+            y: 100.0,
             z: 0.0,
           ),
         ),
@@ -96,7 +137,7 @@
     4294967311: (
       components: {
         "bevy_playground::MoveEntity": (
-          entity: 8589934597,
+          entity: 8589934604,
           delta: (
             x: -100.0,
             y: 0.0,
@@ -105,7 +146,132 @@
         ),
       },
     ),
-    8589934597: (
+    4294967312: (
+      components: {
+        "bevy_playground::MoveEntity": (
+          entity: 8589934604,
+          delta: (
+            x: -100.0,
+            y: 0.0,
+            z: 0.0,
+          ),
+        ),
+      },
+    ),
+    4294967313: (
+      components: {
+        "bevy_playground::MoveEntity": (
+          entity: 8589934604,
+          delta: (
+            x: -100.0,
+            y: 0.0,
+            z: 0.0,
+          ),
+        ),
+      },
+    ),
+    4294967314: (
+      components: {
+        "bevy_playground::SetLevel": (5),
+      },
+    ),
+    4294967315: (
+      components: {
+        "bevy_playground::MoveEntity": (
+          entity: 8589934604,
+          delta: (
+            x: -100.0,
+            y: 0.0,
+            z: 0.0,
+          ),
+        ),
+      },
+    ),
+    4294967316: (
+      components: {
+        "bevy_playground::MoveEntity": (
+          entity: 8589934604,
+          delta: (
+            x: -100.0,
+            y: 0.0,
+            z: 0.0,
+          ),
+        ),
+      },
+    ),
+    8589934593: (
+      components: {
+        "bevy_playground::MoveEntity": (
+          entity: 8589934604,
+          delta: (
+            x: 0.0,
+            y: 100.0,
+            z: 0.0,
+          ),
+        ),
+      },
+    ),
+    8589934601: (
+      components: {
+        "bevy_playground::SetLevel": (1),
+      },
+    ),
+    8589934602: (
+      components: {
+        "bevy_playground::SetLevel": (0),
+      },
+    ),
+    8589934603: (
+      components: {
+        "bevy_playground::LevelText": (),
+        "bevy_render::view::visibility::InheritedVisibility": (true),
+        "bevy_render::view::visibility::ViewVisibility": (false),
+        "bevy_render::view::visibility::Visibility": Inherited,
+        "bevy_transform::components::global_transform::GlobalTransform": ((
+          matrix3: (
+            x_axis: (
+              x: 1.0,
+              y: 0.0,
+              z: 0.0,
+            ),
+            y_axis: (
+              x: 0.0,
+              y: 1.0,
+              z: 0.0,
+            ),
+            z_axis: (
+              x: 0.0,
+              y: 0.0,
+              z: 1.0,
+            ),
+          ),
+          translation: (
+            x: 48.0,
+            y: 12.0,
+            z: 0.0,
+          ),
+        )),
+        "bevy_transform::components::transform::Transform": (
+          translation: (
+            x: 48.0,
+            y: 12.0,
+            z: 0.0,
+          ),
+          rotation: (
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+            w: 1.0,
+          ),
+          scale: (
+            x: 1.0,
+            y: 1.0,
+            z: 1.0,
+          ),
+        ),
+      },
+    ),
+    8589934604: (
       components: {
         "bevy_asset::handle::Handle<bevy_render::texture::image::Image>": Weak(Uuid(
           uuid: "97128bb1-2588-480b-bdc6-87b4adbec477",
@@ -146,15 +312,15 @@
             ),
           ),
           translation: (
-            x: -600.0,
-            y: 0.0,
+            x: 300.0,
+            y: 200.0,
             z: 0.0,
           ),
         )),
         "bevy_transform::components::transform::Transform": (
           translation: (
-            x: -600.0,
-            y: 0.0,
+            x: 300.0,
+            y: 200.0,
             z: 0.0,
           ),
           rotation: (
@@ -171,85 +337,13 @@
         ),
       },
     ),
-    8589934599: (
-      components: {
-        "bevy_playground::MoveEntity": (
-          entity: 8589934597,
-          delta: (
-            x: 0.0,
-            y: 100.0,
-            z: 0.0,
-          ),
-        ),
-      },
-    ),
-    8589934600: (
-      components: {
-        "bevy_playground::MoveEntity": (
-          entity: 8589934597,
-          delta: (
-            x: -100.0,
-            y: 0.0,
-            z: 0.0,
-          ),
-        ),
-      },
-    ),
-    8589934601: (
-      components: {
-        "bevy_playground::MoveEntity": (
-          entity: 8589934597,
-          delta: (
-            x: -100.0,
-            y: 0.0,
-            z: 0.0,
-          ),
-        ),
-      },
-    ),
-    8589934602: (
-      components: {
-        "bevy_playground::MoveEntity": (
-          entity: 8589934597,
-          delta: (
-            x: 0.0,
-            y: -100.0,
-            z: 0.0,
-          ),
-        ),
-      },
-    ),
-    8589934603: (
-      components: {
-        "bevy_playground::MoveEntity": (
-          entity: 8589934597,
-          delta: (
-            x: 0.0,
-            y: -100.0,
-            z: 0.0,
-          ),
-        ),
-      },
-    ),
-    12884901889: (
-      components: {
-        "bevy_playground::MoveEntity": (
-          entity: 8589934597,
-          delta: (
-            x: -100.0,
-            y: 0.0,
-            z: 0.0,
-          ),
-        ),
-      },
-    ),
     12884901890: (
       components: {
         "bevy_playground::MoveEntity": (
-          entity: 8589934597,
+          entity: 8589934604,
           delta: (
-            x: 0.0,
-            y: 100.0,
+            x: 100.0,
+            y: 0.0,
             z: 0.0,
           ),
         ),
@@ -258,25 +352,35 @@
     12884901891: (
       components: {
         "bevy_playground::MoveEntity": (
-          entity: 8589934597,
+          entity: 8589934604,
           delta: (
-            x: -100.0,
+            x: 100.0,
             y: 0.0,
             z: 0.0,
           ),
         ),
       },
     ),
-    12884901900: (
+    12884901893: (
       components: {
         "bevy_playground::MoveEntity": (
-          entity: 8589934597,
+          entity: 8589934604,
           delta: (
-            x: 0.0,
-            y: 100.0,
+            x: 100.0,
+            y: 0.0,
             z: 0.0,
           ),
         ),
+      },
+    ),
+    12884901895: (
+      components: {
+        "bevy_playground::SetLevel": (2),
+      },
+    ),
+    12884901896: (
+      components: {
+        "bevy_playground::SetLevel": (3),
       },
     ),
   },
