@@ -1,12 +1,19 @@
-use std::{mem, sync::LazyLock};
+use std::{fmt::Write, mem, sync::LazyLock};
 
 use bevy::{
-    ecs::{entity::MapEntities, reflect::ReflectMapEntities},
+    color::palettes::css::RED,
+    ecs::{
+        entity::MapEntities, reflect::ReflectMapEntities, traversal::TraverseNone,
+        world::DeferredWorld,
+    },
+    math::VectorSpace,
     prelude::*,
     tasks::IoTaskPool,
+    text::TextLayoutInfo,
+    ui::{widget::TextFlags, ContentSize, FocusPolicy},
 };
 
-use bevy_playground::{Action, History, HistoryItem, PerformAction, Redo, Undo};
+use bevy_playground::{Action, History, HistoryItem, PerformAction, Placeholder, Redo, Undo};
 
 const SCENE_FILE: &str = "scene.scn";
 
@@ -16,6 +23,7 @@ const COMPONENT_FILTER: LazyLock<SceneFilter> = LazyLock::new(|| {
         .allow::<SetLevel>()
         .allow::<MoveEntity>()
         .allow::<Player>()
+        .allow::<LevelText>()
         .allow::<Transform>()
         .allow::<GlobalTransform>()
         .allow::<Sprite>()
@@ -34,11 +42,21 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .init_resource::<Level>()
         .init_resource::<History>()
-        .register_type::<(History, SetLevel, MoveEntity, Level, Player)>()
+        .register_type::<(History, SetLevel, MoveEntity, Level, Player, LevelText)>()
         .add_systems(Startup, setup)
         .add_systems(
             Update,
-            (movement_input, level_input, history_input, save_load_input),
+            (
+                (
+                    movement_input,
+                    level_input,
+                    history_input,
+                    save_load_input,
+                    update_level_text,
+                ),
+                debug_history,
+            )
+                .chain(),
         )
         .run();
 }
@@ -74,9 +92,46 @@ o: load scene
             ..Default::default()
         },
     ));
+    commands.spawn((
+        LevelText,
+        TextBundle {
+            style: Style {
+                ..Default::default()
+            },
+            // text: Text::from_section("level: 0", TextStyle::default()),
+            text: Text::from_sections([
+                TextSection::new("level: ", TextStyle::default()),
+                TextSection::new(
+                    "@",
+                    TextStyle {
+                        color: RED.into(),
+                        ..Default::default()
+                    },
+                ),
+            ]),
+            ..Default::default()
+        },
+    ));
 }
 
-#[derive(Component, Reflect, Clone)]
+#[derive(Component, Reflect, Debug)]
+#[reflect(Component)]
+struct LevelText;
+
+fn update_level_text(mut query: Query<&mut Text, With<LevelText>>, level: Option<Res<Level>>) {
+    let Some(level) = level else {
+        return;
+    };
+    if level.is_changed() {
+        for mut text in &mut query {
+            let section = &mut text.sections[1];
+            section.value.clear();
+            write!(&mut section.value, "{}", level.0).unwrap();
+        }
+    }
+}
+
+#[derive(Component, Reflect, Default, Clone)]
 #[reflect(Component)]
 #[require(HistoryItem(HistoryItem::new::<Self>))]
 struct SetLevel(u32);
@@ -85,6 +140,7 @@ impl Action for SetLevel {
     fn apply(&mut self, world: &mut World) {
         let mut level = world.resource_mut::<Level>();
         mem::swap(&mut self.0, &mut level.0);
+        info!("level: {} -> {}", self.0, level.0);
     }
 
     fn undo(&mut self, world: &mut World) {
@@ -109,6 +165,15 @@ impl Action for MoveEntity {
     fn undo(&mut self, world: &mut World) {
         let mut transform = world.get_mut::<Transform>(self.entity).unwrap();
         transform.translation -= self.delta;
+    }
+}
+
+impl Placeholder for MoveEntity {
+    fn placeholder() -> Self {
+        Self {
+            entity: Entity::PLACEHOLDER,
+            delta: Vec3::MAX,
+        }
     }
 }
 
@@ -168,7 +233,6 @@ fn level_input(mut commands: Commands, key: Res<ButtonInput<KeyCode>>) {
                 );
             });
         }
-        commands.add(debug_history);
     }
 }
 
@@ -185,7 +249,7 @@ fn history_input(mut commands: Commands, key: Res<ButtonInput<KeyCode>>) {
 fn save_load_input(
     mut commands: Commands,
     key: Res<ButtonInput<KeyCode>>,
-    query: Query<Entity, (Without<Window>, Without<Camera>)>,
+    query: Query<Entity, (Without<Window>, Without<Camera>, Without<LevelText>)>,
     asset_server: Res<AssetServer>,
 ) {
     if key.just_pressed(KeyCode::KeyI) {
@@ -205,21 +269,37 @@ fn save_load_input(
     }
 }
 
-fn debug_history(world: &mut World) {
-    let Some((history, _level)) = world
-        .get_resource::<History>()
-        .zip(world.get_resource::<Level>())
-    else {
+fn debug_history(
+    key: Res<ButtonInput<KeyCode>>,
+    history: Option<Res<History>>,
+    level: Option<Res<Level>>,
+    query: Query<&SetLevel>,
+) {
+    let Some((history, level)) = Option::zip(history, level) else {
         return;
     };
 
-    print!("[ ");
-    for _ in 0..history.index {
-        print!("* ")
+    if key.get_just_pressed().next().is_none() {
+        return;
     }
-    print!("[*]");
-    for _ in history.index..history.items.len() {
-        print!("* ")
+
+    print!("[ ");
+    for i in 0..history.index {
+        match query.get(history.items[i]) {
+            Ok(level) => print!("{} ", level.0),
+            Err(_) => print!("* "),
+        }
+    }
+    match history.index < history.items.len() {
+        true => print!("[{}] ", level.0),
+        false => print!("[{}]", level.0),
+    }
+
+    for i in history.index..history.items.len() {
+        match query.get(history.items[i]) {
+            Ok(level) => print!("{} ", level.0),
+            Err(_) => print!("* "),
+        }
     }
     println!(" ]");
 }
