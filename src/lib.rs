@@ -6,12 +6,28 @@ use bevy::{
     reflect::FromType,
 };
 
+pub trait Action: Component + Placeholder {
+    fn apply(&mut self, world: &mut World);
+    fn undo(&mut self, world: &mut World);
+}
+
+/// Types that need a [`Default`] like value when there's no sensible default representation of said type.
+pub trait Placeholder {
+    fn placeholder() -> Self;
+}
+
+impl<T: Default> Placeholder for T {
+    fn placeholder() -> Self {
+        T::default()
+    }
+}
+
 /// Run an action, pushing it to the undo stack.
 pub struct PerformAction<T: Action> {
     pub action: T,
 }
 
-impl<T: Action + Clone> Command for PerformAction<T> {
+impl<T: Action> Command for PerformAction<T> {
     fn apply(mut self, world: &mut World) {
         // since HistoryItem is not Reflect it must be added as a required components to be deserializable
         #[cfg(debug_assertions)]
@@ -67,11 +83,6 @@ impl Command for Redo {
             info!("end of history");
         }
     }
-}
-
-pub trait Action: Component {
-    fn apply(&mut self, world: &mut World);
-    fn undo(&mut self, world: &mut World);
 }
 
 #[derive(Resource, Reflect, Default, Debug, Clone)]
@@ -136,23 +147,31 @@ pub struct HistoryItem {
     redo: fn(&mut World, Entity),
 }
 
-impl<T: Action + Clone> FromType<T> for HistoryItem {
+impl<T: Action> FromType<T> for HistoryItem {
     fn from_type() -> Self {
         Self {
             undo: |world, entity| {
-                let mut action = world.get::<T>(entity).unwrap().clone();
+                let mut action = std::mem::replace(
+                    world.get_mut::<T>(entity).unwrap().as_mut(),
+                    T::placeholder(),
+                );
                 action.undo(world);
+                *world.get_mut::<T>(entity).unwrap() = action;
             },
             redo: |world, entity| {
-                let mut action = world.get::<T>(entity).unwrap().clone();
+                let mut action = std::mem::replace(
+                    world.get_mut::<T>(entity).unwrap().as_mut(),
+                    T::placeholder(),
+                );
                 action.apply(world);
+                *world.get_mut::<T>(entity).unwrap() = action;
             },
         }
     }
 }
 
 impl HistoryItem {
-    pub fn new<T: Action + Clone>() -> Self {
+    pub fn new<T: Action>() -> Self {
         FromType::<T>::from_type()
     }
 
